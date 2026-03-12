@@ -1,0 +1,11 @@
+# Redisson 단일 서버 설정
+# redisson-spring-boot-starter 는 classpath 에 이 파일이 있으면 우선 사용
+# spring.data.redis.* 보다 명시적이므로 이 방식 권장
+singleServerConfig:
+  address: "redis://localhost:6379"
+  connectionPoolSize: 10       # 커넥션 풀 (분산 락 대기 중 블로킹 최소화)
+  connectionMinimumIdleSize: 2
+  connectTimeout: 3000
+  timeout: 3000
+  retryAttempts: 3
+  retryInterval: 1500
