@@ -30,31 +30,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final OrderRepository orderRepository;
     private final WalletRepository walletRepository;
     private final ExternalPaymentClient externalPaymentClient;
     private final ApplicationEventPublisher eventPublisher;
+    private final PaymentValidator validator;  // 검증 로직 위임
 
     @Transactional
     public PaymentResponse pay(PaymentRequest request) {
 
-        // 1. 멱등성 체크: 동일 idempotencyKey 요청은 기존 결과를 그대로 반환
-        paymentRepository.findByIdempotencyKey(request.getIdempotencyKey())
-                .ifPresent(existing -> {
-                    if (existing.getStatus() == Payment.PaymentStatus.SUCCESS) {
-                        throw new PaymentException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
-                    }
-                });
+        // 1. 멱등성 + 주문 상태 검증 (PaymentValidator 에 위임)
+        validator.validateIdempotency(request.getIdempotencyKey());
+        Order order = validator.validateOrder(request.getOrderId());
 
-        // 2. 주문 조회 및 상태 검증
-        Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> new PaymentException(ErrorCode.ORDER_NOT_FOUND));
-
-        if (order.isPaid()) {
-            throw new PaymentException(ErrorCode.ORDER_ALREADY_PAID);
-        }
-
-        // 3. 비관적 락으로 지갑 조회 - SELECT FOR UPDATE
+        // 2. 비관적 락으로 지갑 조회 - SELECT FOR UPDATE
         //    같은 userId 에 대한 동시 결제 요청을 직렬화
         Wallet wallet = walletRepository.findByUserIdWithLock(request.getUserId())
                 .orElseThrow(() -> new PaymentException(ErrorCode.WALLET_NOT_FOUND));

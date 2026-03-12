@@ -21,6 +21,8 @@ public enum ErrorCode {
     PAYMENT_ALREADY_PROCESSED(HttpStatus.CONFLICT, "PMT-002", "이미 처리된 결제입니다"),
     DUPLICATE_IDEMPOTENCY_KEY(HttpStatus.CONFLICT, "PMT-003", "동일한 요청 ID로 이미 결제가 처리되었습니다"),
     PAYMENT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "PMT-004", "외부 결제 처리 중 오류가 발생했습니다"),
+    PAYMENT_ALREADY_CANCELLED(HttpStatus.CONFLICT, "PMT-005", "이미 취소된 결제입니다"),
+    PAYMENT_NOT_CANCELLABLE(HttpStatus.UNPROCESSABLE_ENTITY, "PMT-006", "취소할 수 없는 결제 상태입니다"),
 
     // 락 오류
     LOCK_ACQUISITION_FAILED(HttpStatus.TOO_MANY_REQUESTS, "LCK-001", "현재 요청이 많아 처리할 수 없습니다. 잠시 후 다시 시도해주세요"),

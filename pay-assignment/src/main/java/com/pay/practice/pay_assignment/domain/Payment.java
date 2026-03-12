@@ -1,5 +1,7 @@
 package com.pay.practice.pay_assignment.domain;
 
+import com.pay.practice.pay_assignment.exception.ErrorCode;
+import com.pay.practice.pay_assignment.exception.PaymentException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,7 +46,7 @@ public class Payment {
     private LocalDateTime completedAt;
 
     public enum PaymentStatus {
-        PENDING, SUCCESS, FAILED
+        PENDING, SUCCESS, FAILED, CANCELLED
     }
 
     public static Payment create(Long orderId, Long userId, Long amount, String idempotencyKey) {

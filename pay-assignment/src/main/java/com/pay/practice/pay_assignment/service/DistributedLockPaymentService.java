@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
+
 /**
  * Redisson 분산 락 기반 결제 서비스 (비교용)
  *
@@ -28,9 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class DistributedLockPaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final OrderRepository orderRepository;
     private final WalletRepository walletRepository;
     private final ExternalPaymentClient externalPaymentClient;
+    private final PaymentValidator validator;  // 검증 로직 위임
 
     // key = "PAY:{userId}" 로 사용자 단위 락 적용
     // waitTime=3s: 락 대기 최대 3초, leaseTime=5s: 5초 후 자동 해제 (데드락 방지)
@@ -38,20 +40,9 @@ public class DistributedLockPaymentService {
     @Transactional
     public PaymentResponse pay(PaymentRequest request) {
 
-        // 멱등성 체크
-        paymentRepository.findByIdempotencyKey(request.getIdempotencyKey())
-                .ifPresent(existing -> {
-                    if (existing.getStatus() == Payment.PaymentStatus.SUCCESS) {
-                        throw new PaymentException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
-                    }
-                });
-
-        Order order = orderRepository.findById(request.getOrderId())
-                .orElseThrow(() -> new PaymentException(ErrorCode.ORDER_NOT_FOUND));
-
-        if (order.isPaid()) {
-            throw new PaymentException(ErrorCode.ORDER_ALREADY_PAID);
-        }
+        // 멱등성 + 주문 상태 검증
+        validator.validateIdempotency(request.getIdempotencyKey());
+        Order order = validator.validateOrder(request.getOrderId());
 
         // 분산 락이 이미 동시성을 제어하므로 일반 조회 사용 (DB 락 불필요)
         Wallet wallet = walletRepository.findByUserId(request.getUserId())
