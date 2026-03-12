@@ -3,10 +3,12 @@ package com.pay.practice.pay_assignment.service;
 import com.pay.practice.pay_assignment.domain.*;
 import com.pay.practice.pay_assignment.dto.PaymentRequest;
 import com.pay.practice.pay_assignment.dto.PaymentResponse;
+import com.pay.practice.pay_assignment.event.PaymentCompletedEvent;
 import com.pay.practice.pay_assignment.exception.ErrorCode;
 import com.pay.practice.pay_assignment.exception.PaymentException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class PaymentService {
     private final OrderRepository orderRepository;
     private final WalletRepository walletRepository;
     private final ExternalPaymentClient externalPaymentClient;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public PaymentResponse pay(PaymentRequest request) {
@@ -80,6 +83,17 @@ public class PaymentService {
 
         paymentRepository.save(payment);
         log.info("[Payment] SUCCESS userId={} amount={} key={}", request.getUserId(), request.getAmount(), request.getIdempotencyKey());
+
+        // 7. 결제 완료 이벤트 발행 (비동기 알림 - 트랜잭션과 분리)
+        //    PaymentNotificationService 가 customExecutor(가상 스레드)에서 비동기로 처리
+        //    이메일 발송 실패가 결제 성공 응답에 영향을 주지 않음
+        eventPublisher.publishEvent(new PaymentCompletedEvent(
+                this,
+                payment.getId(),
+                request.getUserId(),
+                request.getAmount(),
+                "user-" + request.getUserId() + "@example.com"  // 실제 서비스: UserRepository 로 이메일 조회
+        ));
 
         return PaymentResponse.from(payment);
     }
