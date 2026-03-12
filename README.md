@@ -4,6 +4,64 @@
 
 ---
 
+## 빠른 참조 (Quick Reference)
+
+> 과제 중 필요한 기능을 찾아 파일 경로로 바로 이동하세요.
+
+### 동시성 제어
+
+| 필요한 것 | 파일 | 핵심 위치 |
+|---|---|---|
+| 비관적 락 (SELECT FOR UPDATE) | `domain/WalletRepository.java` | `findByUserIdWithLock()` — `@Lock(PESSIMISTIC_WRITE)` |
+| 비관적 락 사용 서비스 | `service/PaymentService.java` | `walletRepository.findByUserIdWithLock(userId)` |
+| 분산 락 어노테이션 정의 | `aop/DistributedLock.java` | `key`, `waitTime`, `leaseTime` 속성 |
+| 분산 락 AOP 구현 | `aop/DistributedLockAop.java` | `lock()` — SpEL 파싱 + `tryLock` / `unlock` |
+| 분산 락 사용 서비스 | `service/DistributedLockPaymentService.java` | `@DistributedLock(key = "'PAY:' + #request.userId")` |
+
+### 멱등성 / 검증
+
+| 필요한 것 | 파일 | 핵심 위치 |
+|---|---|---|
+| 멱등성 키 중복 체크 | `service/PaymentValidator.java` | `validateIdempotency()` |
+| 주문 상태 검증 | `service/PaymentValidator.java` | `validateOrder()` |
+| 멱등성 키 DB 인덱스 | `domain/Payment.java` | `@Index(... unique = true)` on `idempotencyKey` |
+
+### 비동기 / 이벤트
+
+| 필요한 것 | 파일 | 핵심 위치 |
+|---|---|---|
+| 이벤트 발행 | `service/PaymentService.java` | `eventPublisher.publishEvent(new PaymentCompletedEvent(...))` |
+| 이벤트 클래스 정의 | `event/PaymentCompletedEvent.java` | `ApplicationEvent` 상속 구조 |
+| 비동기 이벤트 리스너 | `service/PaymentNotificationService.java` | `@Async("customExecutor") @EventListener @Order(1)` |
+| 가상 스레드 Executor 설정 | `config/AsyncConfig.java` | `Executors.newVirtualThreadPerTaskExecutor()` |
+
+### 예외 처리
+
+| 필요한 것 | 파일 | 핵심 위치 |
+|---|---|---|
+| 에러 코드 목록 | `exception/ErrorCode.java` | `PAY / PMT / LCK / CMN` 코드 체계 |
+| 글로벌 예외 핸들러 | `exception/GlobalExceptionHandler.java` | `@RestControllerAdvice` + `@ExceptionHandler` |
+| 도메인 예외 클래스 | `exception/PaymentException.java` | `ErrorCode` 포함 RuntimeException |
+| 에러 응답 포맷 | `exception/ErrorResponse.java` | `code / message / timestamp / errors` |
+
+### 테스트
+
+| 필요한 것 | 파일 | 핵심 위치 |
+|---|---|---|
+| Mockito 단위 테스트 패턴 | `test/.../PaymentServiceUnitTest.java` | `@Nested` + `given/when/then` BDD 구조 |
+| 동시성 테스트 뼈대 | `test/.../PaymentConcurrencyTest.java` | `CountDownLatch` + `ExecutorService` + `AtomicInteger` |
+| 통합 테스트 (H2 + 롤백 검증) | `test/.../PaymentServiceIntegrationTest.java` | 잔액 차감 / 트랜잭션 롤백 / 멱등성 검증 |
+
+### 설정
+
+| 필요한 것 | 파일 | 핵심 위치 |
+|---|---|---|
+| 가상 스레드 활성화 | `resources/application.yaml` | `spring.threads.virtual.enabled: true` |
+| Redis 연결 설정 | `resources/redisson.yaml` | `singleServerConfig.address` |
+| 테스트용 Redis 제외 설정 | `test/resources/application-test.yaml` | `spring.autoconfigure.exclude` |
+
+---
+
 ## 기술 스택
 
 | 항목 | 선택 |
