@@ -10,53 +10,53 @@
 
 | 필요한 것 | 파일 | 핵심 위치 |
 |---|---|---|
-| 비관적 락 (SELECT FOR UPDATE) | `domain/WalletRepository.java` | `findByUserIdWithLock()` — `@Lock(PESSIMISTIC_WRITE)` |
-| 비관적 락 사용 서비스 | `service/PaymentService.java` | `walletRepository.findByUserIdWithLock(userId)` |
-| 분산 락 어노테이션 정의 | `aop/DistributedLock.java` | `key`, `waitTime`, `leaseTime` 속성 |
-| 분산 락 AOP 구현 | `aop/DistributedLockAop.java` | `lock()` — SpEL 파싱 + `tryLock` / `unlock` |
-| 분산 락 사용 서비스 | `service/DistributedLockPaymentService.java` | `@DistributedLock(key = "'PAY:' + #request.userId")` |
+| 비관적 락 (SELECT FOR UPDATE) | [WalletRepository.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/domain/WalletRepository.java) | `findByUserIdWithLock()` — `@Lock(PESSIMISTIC_WRITE)` |
+| 비관적 락 사용 서비스 | [PaymentService.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/service/PaymentService.java) | `walletRepository.findByUserIdWithLock(userId)` |
+| 분산 락 어노테이션 정의 | [DistributedLock.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/aop/DistributedLock.java) | `key`, `waitTime`, `leaseTime` 속성 |
+| 분산 락 AOP 구현 | [DistributedLockAop.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/aop/DistributedLockAop.java) | `lock()` — SpEL 파싱 + `tryLock` / `unlock` |
+| 분산 락 사용 서비스 | [DistributedLockPaymentService.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/service/DistributedLockPaymentService.java) | `@DistributedLock(key = "'PAY:' + #request.userId")` |
 
 ### 멱등성 / 검증
 
 | 필요한 것 | 파일 | 핵심 위치 |
 |---|---|---|
-| 멱등성 키 중복 체크 | `service/PaymentValidator.java` | `validateIdempotency()` |
-| 주문 상태 검증 | `service/PaymentValidator.java` | `validateOrder()` |
-| 멱등성 키 DB 인덱스 | `domain/Payment.java` | `@Index(... unique = true)` on `idempotencyKey` |
+| 멱등성 키 중복 체크 | [PaymentValidator.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/service/PaymentValidator.java) | `validateIdempotency()` |
+| 주문 상태 검증 | [PaymentValidator.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/service/PaymentValidator.java) | `validateOrder()` |
+| 멱등성 키 DB 인덱스 | [Payment.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/domain/Payment.java) | `@Index(... unique = true)` on `idempotencyKey` |
 
 ### 비동기 / 이벤트
 
 | 필요한 것 | 파일 | 핵심 위치 |
 |---|---|---|
-| 이벤트 발행 | `service/PaymentService.java` | `eventPublisher.publishEvent(new PaymentCompletedEvent(...))` |
-| 이벤트 클래스 정의 | `event/PaymentCompletedEvent.java` | `ApplicationEvent` 상속 구조 |
-| 비동기 이벤트 리스너 | `service/PaymentNotificationService.java` | `@Async("customExecutor") @EventListener @Order(1)` |
-| 가상 스레드 Executor 설정 | `config/AsyncConfig.java` | `Executors.newVirtualThreadPerTaskExecutor()` |
+| 이벤트 발행 | [PaymentService.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/service/PaymentService.java) | `eventPublisher.publishEvent(new PaymentCompletedEvent(...))` |
+| 이벤트 클래스 정의 | [PaymentCompletedEvent.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/event/PaymentCompletedEvent.java) | `ApplicationEvent` 상속 구조 |
+| 비동기 이벤트 리스너 | [PaymentNotificationService.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/service/PaymentNotificationService.java) | `@Async("customExecutor") @EventListener @Order(1)` |
+| 가상 스레드 Executor 설정 | [AsyncConfig.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/config/AsyncConfig.java) | `Executors.newVirtualThreadPerTaskExecutor()` |
 
 ### 예외 처리
 
 | 필요한 것 | 파일 | 핵심 위치 |
 |---|---|---|
-| 에러 코드 목록 | `exception/ErrorCode.java` | `PAY / PMT / LCK / CMN` 코드 체계 |
-| 글로벌 예외 핸들러 | `exception/GlobalExceptionHandler.java` | `@RestControllerAdvice` + `@ExceptionHandler` |
-| 도메인 예외 클래스 | `exception/PaymentException.java` | `ErrorCode` 포함 RuntimeException |
-| 에러 응답 포맷 | `exception/ErrorResponse.java` | `code / message / timestamp / errors` |
+| 에러 코드 목록 | [ErrorCode.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/ErrorCode.java) | `PAY / PMT / LCK / CMN` 코드 체계 |
+| 글로벌 예외 핸들러 | [GlobalExceptionHandler.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/GlobalExceptionHandler.java) | `@RestControllerAdvice` + `@ExceptionHandler` |
+| 도메인 예외 클래스 | [PaymentException.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/PaymentException.java) | `ErrorCode` 포함 RuntimeException |
+| 에러 응답 포맷 | [ErrorResponse.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/ErrorResponse.java) | `code / message / timestamp / errors` |
 
 ### 테스트
 
 | 필요한 것 | 파일 | 핵심 위치 |
 |---|---|---|
-| Mockito 단위 테스트 패턴 | `test/.../PaymentServiceUnitTest.java` | `@Nested` + `given/when/then` BDD 구조 |
-| 동시성 테스트 뼈대 | `test/.../PaymentConcurrencyTest.java` | `CountDownLatch` + `ExecutorService` + `AtomicInteger` |
-| 통합 테스트 (H2 + 롤백 검증) | `test/.../PaymentServiceIntegrationTest.java` | 잔액 차감 / 트랜잭션 롤백 / 멱등성 검증 |
+| Mockito 단위 테스트 패턴 | [PaymentServiceUnitTest.java](pay-assignment/src/test/java/com/pay/practice/pay_assignment/PaymentServiceUnitTest.java) | `@Nested` + `given/when/then` BDD 구조 |
+| 동시성 테스트 뼈대 | [PaymentConcurrencyTest.java](pay-assignment/src/test/java/com/pay/practice/pay_assignment/PaymentConcurrencyTest.java) | `CountDownLatch` + `ExecutorService` + `AtomicInteger` |
+| 통합 테스트 (H2 + 롤백 검증) | [PaymentServiceIntegrationTest.java](pay-assignment/src/test/java/com/pay/practice/pay_assignment/PaymentServiceIntegrationTest.java) | 잔액 차감 / 트랜잭션 롤백 / 멱등성 검증 |
 
 ### 설정
 
 | 필요한 것 | 파일 | 핵심 위치 |
 |---|---|---|
-| 가상 스레드 활성화 | `resources/application.yaml` | `spring.threads.virtual.enabled: true` |
-| Redis 연결 설정 | `resources/redisson.yaml` | `singleServerConfig.address` |
-| 테스트용 Redis 제외 설정 | `test/resources/application-test.yaml` | `spring.autoconfigure.exclude` |
+| 가상 스레드 활성화 | [application.yaml](pay-assignment/src/main/resources/application.yaml) | `spring.threads.virtual.enabled: true` |
+| Redis 연결 설정 | [redisson.yaml](pay-assignment/src/main/resources/redisson.yaml) | `singleServerConfig.address` |
+| 테스트용 Redis 제외 설정 | [application-test.yaml](pay-assignment/src/test/resources/application-test.yaml) | `spring.autoconfigure.exclude` |
 
 ---
 
