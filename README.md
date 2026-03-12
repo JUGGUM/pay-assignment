@@ -1,6 +1,5 @@
 # Payment System Base Project
 
-결제 시스템 사전과제 대비용 베이스 프로젝트입니다.  
 **Java 21 + Spring Boot 3.2 + JPA + Redis(Redisson)** 기반의 동시성 안전 결제 처리 구조를 담고 있습니다.
 
 ---
