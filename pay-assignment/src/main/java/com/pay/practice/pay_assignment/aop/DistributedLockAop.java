@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.aop;
 
-import com.pay.practice.pay_assignment.exception.ErrorCode;
-import com.pay.practice.pay_assignment.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.ErrorCode;
+import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;

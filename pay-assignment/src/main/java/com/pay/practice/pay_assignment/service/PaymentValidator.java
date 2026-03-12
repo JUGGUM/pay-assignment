@@ -4,8 +4,8 @@ import com.pay.practice.pay_assignment.domain.Order;
 import com.pay.practice.pay_assignment.domain.OrderRepository;
 import com.pay.practice.pay_assignment.domain.Payment;
 import com.pay.practice.pay_assignment.domain.PaymentRepository;
-import com.pay.practice.pay_assignment.exception.ErrorCode;
-import com.pay.practice.pay_assignment.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.ErrorCode;
+import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

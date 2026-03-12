@@ -37,10 +37,10 @@
 
 | 필요한 것 | 파일 | 핵심 위치 |
 |---|---|---|
-| 에러 코드 목록 | [ErrorCode.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/ErrorCode.java) | `PAY / PMT / LCK / CMN` 코드 체계 |
-| 글로벌 예외 핸들러 | [GlobalExceptionHandler.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/GlobalExceptionHandler.java) | `@RestControllerAdvice` + `@ExceptionHandler` |
-| 도메인 예외 클래스 | [PaymentException.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/PaymentException.java) | `ErrorCode` 포함 RuntimeException |
-| 에러 응답 포맷 | [ErrorResponse.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/exception/ErrorResponse.java) | `code / message / timestamp / errors` |
+| 에러 코드 목록 | [ErrorCode.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/common/error/ErrorCode.java) | `PAY / PMT / LCK / CMN` 코드 체계 |
+| 글로벌 예외 핸들러 | [GlobalExceptionHandler.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/common/error/GlobalExceptionHandler.java) | `@RestControllerAdvice` + `@ExceptionHandler` |
+| 도메인 예외 클래스 | [PaymentException.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/common/error/exception/PaymentException.java) | `ErrorCode` 포함 RuntimeException |
+| 에러 응답 포맷 | [ErrorResponse.java](pay-assignment/src/main/java/com/pay/practice/pay_assignment/common/error/ErrorResponse.java) | `code / message / timestamp / errors` |
 
 ### 테스트
 
@@ -148,14 +148,16 @@ src/main/java/com/pay/practice/pay_assignment/
 │   ├── Order.java / OrderRepository.java
 │   ├── Payment.java / PaymentRepository.java
 │   └── Wallet.java / WalletRepository.java  # findByUserIdWithLock (비관적 락)
+├── common/
+│   └── error/
+│       ├── ErrorCode.java            # 금융 도메인 에러 코드 (PAY-001 등)
+│       ├── ErrorResponse.java
+│       ├── GlobalExceptionHandler.java  # @RestControllerAdvice
+│       └── exception/
+│           └── PaymentException.java
 ├── dto/
 │   ├── PaymentRequest.java
 │   └── PaymentResponse.java
-├── exception/
-│   ├── ErrorCode.java                # 금융 도메인 에러 코드 (PAY-001 등)
-│   ├── ErrorResponse.java
-│   ├── GlobalExceptionHandler.java   # @RestControllerAdvice
-│   └── PaymentException.java
 └── service/
     ├── ExternalPaymentClient.java    # 외부 PG API 모킹
     ├── PaymentService.java           # 비관적 락 방식

@@ -1,4 +1,4 @@
-package com.pay.practice.pay_assignment.exception;
+package com.pay.practice.pay_assignment.common.error;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

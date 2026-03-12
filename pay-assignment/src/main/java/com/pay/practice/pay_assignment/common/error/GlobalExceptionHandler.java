@@ -1,5 +1,6 @@
-package com.pay.practice.pay_assignment.exception;
+package com.pay.practice.pay_assignment.common.error;
 
+import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
