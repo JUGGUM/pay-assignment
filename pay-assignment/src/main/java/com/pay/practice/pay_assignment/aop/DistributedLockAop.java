@@ -14,6 +14,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -23,10 +24,14 @@ import java.lang.reflect.Method;
  * - 비관적 락: 단일 DB 인스턴스 환경에서 간단하고 강력
  * - 분산 락(Redisson): 다중 서버/DB 샤딩 환경에서 DB 커넥션 낭비 없이 제어
  * 이 Aspect는 @DistributedLock 어노테이션이 붙은 메서드에 자동 적용됨
+ *
+ * @ConditionalOnBean: Redis(Redisson) 가 없는 테스트 환경에서는 이 빈이 생성되지 않음
+ * → 테스트 시 RedissonClient 빈 부재로 컨텍스트가 실패하는 것을 방지
  */
 @Slf4j
 @Aspect
 @Component
+@ConditionalOnBean(RedissonClient.class)
 @RequiredArgsConstructor
 public class DistributedLockAop {
 
