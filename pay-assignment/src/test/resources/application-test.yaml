@@ -1,0 +1,16 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+# 테스트 환경: Redisson autoconfigure 비활성화 (Redis 없이 비관적 락 테스트)
+spring.autoconfigure.exclude: org.redisson.spring.starter.RedissonAutoConfiguration
