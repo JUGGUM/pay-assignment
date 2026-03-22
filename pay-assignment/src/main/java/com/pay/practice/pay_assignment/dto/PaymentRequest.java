@@ -24,6 +24,12 @@ public class PaymentRequest {
     @NotBlank(message = "idempotencyKey 는 필수입니다")
     private String idempotencyKey;
 
+    // 상품 연동 (선택): null이면 재고 차감 없이 단순 결제만 진행
+    private Long productId;
+
+    @Positive(message = "quantity 는 양수여야 합니다")
+    private Integer quantity;
+
     // 테스트/내부 생성용 팩토리 - Jackson 역직렬화는 @NoArgsConstructor 사용
     public static PaymentRequest of(Long orderId, Long userId, Long amount, String idempotencyKey) {
         PaymentRequest r = new PaymentRequest();
@@ -31,6 +37,14 @@ public class PaymentRequest {
         r.userId = userId;
         r.amount = amount;
         r.idempotencyKey = idempotencyKey;
+        return r;
+    }
+
+    public static PaymentRequest of(Long orderId, Long userId, Long amount, String idempotencyKey,
+                                    Long productId, Integer quantity) {
+        PaymentRequest r = of(orderId, userId, amount, idempotencyKey);
+        r.productId = productId;
+        r.quantity = quantity;
         return r;
     }
 }

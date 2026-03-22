@@ -45,8 +45,28 @@ public class Payment {
 
     private LocalDateTime completedAt;
 
+    // 상품 연동 시 재고 복구를 위해 결제 시점의 productId/quantity 저장
+    // null 허용: 상품 없이 단순 결제도 지원
+    private Long productId;
+    private Integer quantity;
+
     public enum PaymentStatus {
-        PENDING, SUCCESS, FAILED, CANCELLED
+        PENDING, SUCCESS, FAILED, CANCELLED;
+
+        /**
+         * 허용된 상태 전이 정의
+         * - PENDING → SUCCESS, FAILED, CANCELLED
+         * - SUCCESS → CANCELLED (정상 결제 취소/환불)
+         * - FAILED, CANCELLED → 전이 불가 (단말 상태)
+         * FAILED는 이미 트랜잭션 롤백으로 잔액이 복구됐으므로 취소 대상이 아님
+         */
+        public boolean canTransitionTo(PaymentStatus next) {
+            return switch (this) {
+                case PENDING  -> next == SUCCESS || next == FAILED || next == CANCELLED;
+                case SUCCESS  -> next == CANCELLED;
+                case FAILED, CANCELLED -> false;
+            };
+        }
     }
 
     public static Payment create(Long orderId, Long userId, Long amount, String idempotencyKey) {
@@ -60,13 +80,38 @@ public class Payment {
         return payment;
     }
 
+    /** 결제에 상품 정보를 연결 - 취소 시 재고 복구에 사용 */
+    public void attachProduct(Long productId, Integer quantity) {
+        this.productId = productId;
+        this.quantity = quantity;
+    }
+
     public void complete() {
+        if (!status.canTransitionTo(PaymentStatus.SUCCESS)) {
+            throw new PaymentException(ErrorCode.INVALID_STATUS_TRANSITION);
+        }
         this.status = PaymentStatus.SUCCESS;
         this.completedAt = LocalDateTime.now();
     }
 
     public void fail() {
+        if (!status.canTransitionTo(PaymentStatus.FAILED)) {
+            throw new PaymentException(ErrorCode.INVALID_STATUS_TRANSITION);
+        }
         this.status = PaymentStatus.FAILED;
+        this.completedAt = LocalDateTime.now();
+    }
+
+    public void cancel() {
+        // 이미 취소된 건은 더 구체적인 에러 코드로 응답
+        if (this.status == PaymentStatus.CANCELLED) {
+            throw new PaymentException(ErrorCode.PAYMENT_ALREADY_CANCELLED);
+        }
+        if (!status.canTransitionTo(PaymentStatus.CANCELLED)) {
+            // SUCCESS가 아닌 상태(PENDING, FAILED)에서 취소 시도
+            throw new PaymentException(ErrorCode.INVALID_STATUS_TRANSITION);
+        }
+        this.status = PaymentStatus.CANCELLED;
         this.completedAt = LocalDateTime.now();
     }
 }

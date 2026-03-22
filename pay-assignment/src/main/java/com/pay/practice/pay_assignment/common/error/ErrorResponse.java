@@ -2,26 +2,18 @@ package com.pay.practice.pay_assignment.common.error;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
+/**
+ * @param errors validation 오류 목록
+ */
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ErrorResponse {
+public record ErrorResponse(String code, String message, LocalDateTime timestamp, List<FieldError> errors) {
 
-    private final String code;
-    private final String message;
-    private final LocalDateTime timestamp;
-    private final List<FieldError> errors;  // validation 오류 목록
-
-    @Getter
-    @Builder
-    public static class FieldError {
-        private final String field;
-        private final String reason;
+    public record FieldError(String field, String reason) {
     }
 
     public static ErrorResponse of(ErrorCode errorCode) {

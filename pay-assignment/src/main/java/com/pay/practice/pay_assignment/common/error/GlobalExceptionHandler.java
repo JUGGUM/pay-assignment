@@ -28,10 +28,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
         BindingResult br = e.getBindingResult();
         List<ErrorResponse.FieldError> errors = br.getFieldErrors().stream()
-                .map(fe -> ErrorResponse.FieldError.builder()
-                        .field(fe.getField())
-                        .reason(fe.getDefaultMessage())
-                        .build())
+                .map(fe -> new ErrorResponse.FieldError(fe.getField(), fe.getDefaultMessage()))
                 .toList();
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT.getHttpStatus())

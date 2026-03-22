@@ -24,6 +24,13 @@ public enum ErrorCode {
     PAYMENT_ALREADY_CANCELLED(HttpStatus.CONFLICT, "PMT-005", "이미 취소된 결제입니다"),
     PAYMENT_NOT_CANCELLABLE(HttpStatus.UNPROCESSABLE_ENTITY, "PMT-006", "취소할 수 없는 결제 상태입니다"),
 
+    // 상태 전이 오류
+    INVALID_STATUS_TRANSITION(HttpStatus.UNPROCESSABLE_ENTITY, "PMT-007", "허용되지 않은 상태 전이입니다"),
+
+    // 상품/재고 오류
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "PRD-001", "상품을 찾을 수 없습니다"),
+    INSUFFICIENT_STOCK(HttpStatus.UNPROCESSABLE_ENTITY, "PRD-002", "재고가 부족합니다"),
+
     // 락 오류
     LOCK_ACQUISITION_FAILED(HttpStatus.TOO_MANY_REQUESTS, "LCK-001", "현재 요청이 많아 처리할 수 없습니다. 잠시 후 다시 시도해주세요"),
 

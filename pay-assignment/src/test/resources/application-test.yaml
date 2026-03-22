@@ -12,7 +12,9 @@ spring:
       ddl-auto: create-drop
     show-sql: false
   # Redisson autoconfigure 비활성화 - Redis 없이 비관적 락 테스트 가능
+  # RedissonAutoConfigurationV2 만 auto-configuration으로 등록됨 (AutoConfiguration.imports)
+  # RedissonAutoConfiguration 은 auto-configuration이 아니므로 exclude 대상이 아님
+  # → TestRedissonConfig 에서 mock RedissonClient 를 제공해 Redisson 연결 시도 자체를 차단
   autoconfigure:
     exclude:
-      - org.redisson.spring.starter.RedissonAutoConfiguration
       - org.redisson.spring.starter.RedissonAutoConfigurationV2

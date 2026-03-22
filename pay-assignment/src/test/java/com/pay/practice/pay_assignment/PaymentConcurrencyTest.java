@@ -99,7 +99,18 @@ class PaymentConcurrencyTest {
     }
 
     // ─────────────────────────────────────────────
-    // 시나리오 4: 멱등성 - 동일 key 중복 요청
+    // 시나리오 4: 잔액 딱 1건치 - 동시 100건 중 1건만 성공
+    // ─────────────────────────────────────────────
+    @Test
+    @DisplayName("[100 threads] 잔액 10,000 / 건당 10,000 → 1건만 성공, 나머지 99건 잔액 부족")
+    void concurrentPay_100threads_onlyOneSuccess() throws InterruptedException {
+        // 잔액이 딱 1건치만 있으므로, 비관적 락으로 직렬화된 후 첫 번째 요청만 성공
+        // 나머지 99건은 잔액 부족(INSUFFICIENT_BALANCE) 예외
+        runConcurrentTest(100, 10_000L, 10_000L, 1, 99, 0L);
+    }
+
+    // ─────────────────────────────────────────────
+    // 시나리오 5: 멱등성 - 동일 key 중복 요청
     // ─────────────────────────────────────────────
     @Test
     @DisplayName("[10 threads] 동일 idempotencyKey 동시 요청 → 1건만 성공")

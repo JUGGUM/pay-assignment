@@ -8,6 +8,7 @@ import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
 import com.pay.practice.pay_assignment.service.ExternalPaymentClient;
 import com.pay.practice.pay_assignment.service.PaymentService;
 import com.pay.practice.pay_assignment.service.PaymentValidator;
+import com.pay.practice.pay_assignment.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,9 +38,11 @@ class PaymentServiceUnitTest {
 
     @Mock private PaymentRepository paymentRepository;
     @Mock private WalletRepository walletRepository;
+    @Mock private OrderRepository orderRepository;  // cancel() 에서 사용, pay() 테스트엔 미사용
     @Mock private ExternalPaymentClient externalPaymentClient;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private PaymentValidator validator;
+    @Mock private ProductService productService;    // productId=null 요청에서는 호출 안 됨
 
     @InjectMocks private PaymentService paymentService;
 
