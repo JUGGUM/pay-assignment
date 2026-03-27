@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.domain;
 
-import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
+import com.pay.practice.pay_assignment.config.error.ErrorCode;
+import com.pay.practice.pay_assignment.config.error.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

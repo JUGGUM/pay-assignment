@@ -4,9 +4,9 @@ import com.pay.practice.pay_assignment.domain.Order;
 import com.pay.practice.pay_assignment.domain.OrderRepository;
 import com.pay.practice.pay_assignment.domain.Payment;
 import com.pay.practice.pay_assignment.domain.PaymentRepository;
-import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
-import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
+import com.pay.practice.pay_assignment.config.error.ErrorCode;
+import com.pay.practice.pay_assignment.config.error.exception.BadRequestException;
+import com.pay.practice.pay_assignment.config.error.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

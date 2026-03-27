@@ -1,8 +1,8 @@
-package com.pay.practice.pay_assignment.common.error;
+package com.pay.practice.pay_assignment.config.error;
 
-import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
-import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
-import com.pay.practice.pay_assignment.common.error.exception.UnauthorizedException;
+import com.pay.practice.pay_assignment.config.error.exception.BadRequestException;
+import com.pay.practice.pay_assignment.config.error.exception.NotFoundException;
+import com.pay.practice.pay_assignment.config.error.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

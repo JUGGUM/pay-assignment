@@ -1,4 +1,4 @@
-package com.pay.practice.pay_assignment.common.error;
+package com.pay.practice.pay_assignment.config.error;
 
 import org.springframework.http.HttpStatus;
 

@@ -1,6 +1,6 @@
-package com.pay.practice.pay_assignment.common.error.exception;
+package com.pay.practice.pay_assignment.config.error.exception;
 
-import com.pay.practice.pay_assignment.common.error.ErrorCode;
+import com.pay.practice.pay_assignment.config.error.ErrorCode;
 
 public class UnauthorizedException extends CustomBaseException {
 

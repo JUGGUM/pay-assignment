@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.service;
 
-import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
+import com.pay.practice.pay_assignment.config.error.ErrorCode;
+import com.pay.practice.pay_assignment.config.error.exception.NotFoundException;
 import com.pay.practice.pay_assignment.domain.Product;
 import com.pay.practice.pay_assignment.domain.ProductRepository;
 import lombok.RequiredArgsConstructor;
