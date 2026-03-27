@@ -9,7 +9,7 @@ public record ErrorResponse(
 ) {
     public static ErrorResponse of(ErrorCode errorCode) {
         return new ErrorResponse(
-                errorCode.name(),
+                errorCode.getCode(),
                 errorCode.getMessage(),
                 LocalDateTime.now()
         );
