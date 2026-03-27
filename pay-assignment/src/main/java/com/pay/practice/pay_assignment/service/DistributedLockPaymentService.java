@@ -5,7 +5,8 @@ import com.pay.practice.pay_assignment.domain.*;
 import com.pay.practice.pay_assignment.dto.PaymentRequest;
 import com.pay.practice.pay_assignment.dto.PaymentResponse;
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.exception.InternalServerException;
+import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class DistributedLockPaymentService {
 
         // 분산 락이 이미 동시성을 제어하므로 일반 조회 사용 (DB 락 불필요)
         Wallet wallet = walletRepository.findByUserId(request.getUserId())
-                .orElseThrow(() -> new PaymentException(ErrorCode.WALLET_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND));
 
         wallet.decrease(request.getAmount());
 
@@ -62,7 +63,7 @@ public class DistributedLockPaymentService {
             order.markPaid();
         } else {
             payment.fail();
-            throw new PaymentException(ErrorCode.PAYMENT_FAILED);
+            throw new InternalServerException(ErrorCode.PAYMENT_FAILED);
         }
 
         paymentRepository.save(payment);

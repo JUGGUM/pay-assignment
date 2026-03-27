@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.domain;
 
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.exception.UnprocessableEntityException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +37,7 @@ public class Wallet {
     // 잔액 차감 - 금융 정합성을 위해 도메인 내부에서 검증
     public void decrease(Long amount) {
         if (this.balance < amount) {
-            throw new PaymentException(ErrorCode.INSUFFICIENT_BALANCE);
+            throw new UnprocessableEntityException(ErrorCode.INSUFFICIENT_BALANCE);
         }
         this.balance -= amount;
     }

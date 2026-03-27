@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.service;
 
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
 import com.pay.practice.pay_assignment.domain.Product;
 import com.pay.practice.pay_assignment.domain.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +28,8 @@ public class ProductService {
     @Transactional
     public void decrease(Long productId, int quantity) {
         Product product = productRepository.findByIdWithLock(productId)
-                .orElseThrow(() -> new PaymentException(ErrorCode.PRODUCT_NOT_FOUND));
-        product.decrease(quantity);  // 재고 부족 시 도메인에서 PaymentException 발생
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.decrease(quantity);  // 재고 부족 시 도메인에서 UnprocessableEntityException 발생
     }
 
     /**
@@ -41,7 +41,7 @@ public class ProductService {
     @Transactional
     public void increase(Long productId, int quantity) {
         Product product = productRepository.findByIdWithLock(productId)
-                .orElseThrow(() -> new PaymentException(ErrorCode.PRODUCT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
         product.increase(quantity);
     }
 }

@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.domain;
 
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.exception.UnprocessableEntityException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,7 +40,7 @@ public class Product {
      */
     public void decrease(int quantity) {
         if (this.stock < quantity) {
-            throw new PaymentException(ErrorCode.INSUFFICIENT_STOCK);
+            throw new UnprocessableEntityException(ErrorCode.INSUFFICIENT_STOCK);
         }
         this.stock -= quantity;
     }

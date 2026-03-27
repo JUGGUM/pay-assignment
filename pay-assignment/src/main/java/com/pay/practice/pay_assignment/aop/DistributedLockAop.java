@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.aop;
 
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.exception.TooManyRequestsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -53,7 +53,7 @@ public class DistributedLockAop {
             acquired = lock.tryLock(annotation.waitTime(), annotation.leaseTime(), annotation.timeUnit());
             if (!acquired) {
                 // waitTime 초과 - 다른 요청이 락을 점유 중
-                throw new PaymentException(ErrorCode.LOCK_ACQUISITION_FAILED);
+                throw new TooManyRequestsException(ErrorCode.LOCK_ACQUISITION_FAILED);
             }
             log.debug("[DistributedLock] acquired key={}", lockKey);
             return joinPoint.proceed();

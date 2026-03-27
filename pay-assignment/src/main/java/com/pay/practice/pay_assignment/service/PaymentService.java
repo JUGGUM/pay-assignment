@@ -6,7 +6,8 @@ import com.pay.practice.pay_assignment.dto.PaymentResponse;
 import com.pay.practice.pay_assignment.event.PaymentCancelledEvent;
 import com.pay.practice.pay_assignment.event.PaymentCompletedEvent;
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.PaymentException;
+import com.pay.practice.pay_assignment.common.error.exception.InternalServerException;
+import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,7 +51,7 @@ public class PaymentService {
         // 2. 비관적 락으로 지갑 조회 - SELECT FOR UPDATE
         //    같은 userId 에 대한 동시 결제 요청을 직렬화
         Wallet wallet = walletRepository.findByUserIdWithLock(request.getUserId())
-                .orElseThrow(() -> new PaymentException(ErrorCode.WALLET_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND));
 
         // 3. 잔액 차감 (도메인 내부에서 잔액 부족 검증)
         wallet.decrease(request.getAmount());
@@ -83,7 +84,7 @@ public class PaymentService {
             payment.fail();
             order.markFailed();
             // 실패 시 wallet.decrease() / productService.decrease() 는 트랜잭션 롤백으로 자동 원복
-            throw new PaymentException(ErrorCode.PAYMENT_FAILED);
+            throw new InternalServerException(ErrorCode.PAYMENT_FAILED);
         }
 
         paymentRepository.save(payment);
@@ -123,7 +124,7 @@ public class PaymentService {
 
         // 1. 비관적 락으로 결제 조회 (동시 취소 요청 직렬화)
         Payment payment = paymentRepository.findByIdWithLock(paymentId)
-                .orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_NOT_FOUND));
 
         // 2. Payment 상태 전이 검증 및 취소
         //    CANCELLED → 예외, FAILED → 예외(환불 대상 아님), SUCCESS → CANCELLED 허용
@@ -131,12 +132,12 @@ public class PaymentService {
 
         // 3. Order 취소 (PAID → CANCELLED)
         Order order = orderRepository.findById(payment.getOrderId())
-                .orElseThrow(() -> new PaymentException(ErrorCode.ORDER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
         order.cancel();
 
         // 4. 지갑 잔액 복구
         Wallet wallet = walletRepository.findByUserIdWithLock(payment.getUserId())
-                .orElseThrow(() -> new PaymentException(ErrorCode.WALLET_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.WALLET_NOT_FOUND));
         wallet.increase(payment.getAmount());
 
         // 5. 재고 복구 (결제 시 상품이 포함된 경우)
@@ -162,7 +163,7 @@ public class PaymentService {
     @Transactional(readOnly = true)
     public PaymentResponse getPayment(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new PaymentException(ErrorCode.PAYMENT_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PAYMENT_NOT_FOUND));
         return PaymentResponse.from(payment);
     }
 
