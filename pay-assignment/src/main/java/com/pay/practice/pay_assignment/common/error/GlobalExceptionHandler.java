@@ -1,6 +1,8 @@
 package com.pay.practice.pay_assignment.common.error;
 
-import com.pay.practice.pay_assignment.common.error.exception.*;
+import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
+import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
+import com.pay.practice.pay_assignment.common.error.exception.UnauthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,14 +21,6 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(e.getErrorCode()));
     }
 
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
-        log.warn("[UnauthorizedException] errorCode={}, message={}", e.getErrorCode().name(), e.getMessage());
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ErrorResponse.of(e.getErrorCode()));
-    }
-
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
         log.warn("[NotFoundException] errorCode={}, message={}", e.getErrorCode().name(), e.getMessage());
@@ -35,33 +29,9 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(e.getErrorCode()));
     }
 
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException e) {
-        log.warn("[ConflictException] errorCode={}, message={}", e.getErrorCode().name(), e.getMessage());
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ErrorResponse.of(e.getErrorCode()));
-    }
-
-    @ExceptionHandler(UnprocessableEntityException.class)
-    public ResponseEntity<ErrorResponse> handleUnprocessableEntityException(UnprocessableEntityException e) {
-        log.warn("[UnprocessableEntityException] errorCode={}, message={}", e.getErrorCode().name(), e.getMessage());
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ErrorResponse.of(e.getErrorCode()));
-    }
-
-    @ExceptionHandler(TooManyRequestsException.class)
-    public ResponseEntity<ErrorResponse> handleTooManyRequestsException(TooManyRequestsException e) {
-        log.warn("[TooManyRequestsException] errorCode={}, message={}", e.getErrorCode().name(), e.getMessage());
-        return ResponseEntity
-                .status(e.getErrorCode().getStatus())
-                .body(ErrorResponse.of(e.getErrorCode()));
-    }
-
-    @ExceptionHandler(InternalServerException.class)
-    public ResponseEntity<ErrorResponse> handleInternalServerException(InternalServerException e) {
-        log.error("[InternalServerException] errorCode={}, message={}", e.getErrorCode().name(), e.getMessage());
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
+        log.warn("[UnauthorizedException] errorCode={}, message={}", e.getErrorCode().name(), e.getMessage());
         return ResponseEntity
                 .status(e.getErrorCode().getStatus())
                 .body(ErrorResponse.of(e.getErrorCode()));

@@ -1,8 +1,7 @@
 package com.pay.practice.pay_assignment.domain;
 
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.ConflictException;
-import com.pay.practice.pay_assignment.common.error.exception.UnprocessableEntityException;
+import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -89,7 +88,7 @@ public class Payment {
 
     public void complete() {
         if (!status.canTransitionTo(PaymentStatus.SUCCESS)) {
-            throw new UnprocessableEntityException(ErrorCode.INVALID_STATUS_TRANSITION);
+            throw new BadRequestException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = PaymentStatus.SUCCESS;
         this.completedAt = LocalDateTime.now();
@@ -97,7 +96,7 @@ public class Payment {
 
     public void fail() {
         if (!status.canTransitionTo(PaymentStatus.FAILED)) {
-            throw new UnprocessableEntityException(ErrorCode.INVALID_STATUS_TRANSITION);
+            throw new BadRequestException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = PaymentStatus.FAILED;
         this.completedAt = LocalDateTime.now();
@@ -106,11 +105,11 @@ public class Payment {
     public void cancel() {
         // 이미 취소된 건은 더 구체적인 에러 코드로 응답
         if (this.status == PaymentStatus.CANCELLED) {
-            throw new ConflictException(ErrorCode.PAYMENT_ALREADY_CANCELLED);
+            throw new BadRequestException(ErrorCode.PAYMENT_ALREADY_CANCELLED);
         }
         if (!status.canTransitionTo(PaymentStatus.CANCELLED)) {
             // SUCCESS가 아닌 상태(PENDING, FAILED)에서 취소 시도
-            throw new UnprocessableEntityException(ErrorCode.INVALID_STATUS_TRANSITION);
+            throw new BadRequestException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = PaymentStatus.CANCELLED;
         this.completedAt = LocalDateTime.now();

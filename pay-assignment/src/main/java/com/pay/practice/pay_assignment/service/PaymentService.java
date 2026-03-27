@@ -6,7 +6,7 @@ import com.pay.practice.pay_assignment.dto.PaymentResponse;
 import com.pay.practice.pay_assignment.event.PaymentCancelledEvent;
 import com.pay.practice.pay_assignment.event.PaymentCompletedEvent;
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.InternalServerException;
+import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
 import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +84,7 @@ public class PaymentService {
             payment.fail();
             order.markFailed();
             // 실패 시 wallet.decrease() / productService.decrease() 는 트랜잭션 롤백으로 자동 원복
-            throw new InternalServerException(ErrorCode.PAYMENT_FAILED);
+            throw new BadRequestException(ErrorCode.PAYMENT_FAILED);
         }
 
         paymentRepository.save(payment);

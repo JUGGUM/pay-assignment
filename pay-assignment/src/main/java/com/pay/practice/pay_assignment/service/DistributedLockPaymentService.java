@@ -5,7 +5,7 @@ import com.pay.practice.pay_assignment.domain.*;
 import com.pay.practice.pay_assignment.dto.PaymentRequest;
 import com.pay.practice.pay_assignment.dto.PaymentResponse;
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.InternalServerException;
+import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
 import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +63,7 @@ public class DistributedLockPaymentService {
             order.markPaid();
         } else {
             payment.fail();
-            throw new InternalServerException(ErrorCode.PAYMENT_FAILED);
+            throw new BadRequestException(ErrorCode.PAYMENT_FAILED);
         }
 
         paymentRepository.save(payment);

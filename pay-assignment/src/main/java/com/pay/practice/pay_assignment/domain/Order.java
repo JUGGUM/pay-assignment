@@ -1,7 +1,7 @@
 package com.pay.practice.pay_assignment.domain;
 
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.UnprocessableEntityException;
+import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,21 +61,21 @@ public class Order {
 
     public void markPaid() {
         if (!status.canTransitionTo(OrderStatus.PAID)) {
-            throw new UnprocessableEntityException(ErrorCode.INVALID_STATUS_TRANSITION);
+            throw new BadRequestException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = OrderStatus.PAID;
     }
 
     public void markFailed() {
         if (!status.canTransitionTo(OrderStatus.FAILED)) {
-            throw new UnprocessableEntityException(ErrorCode.INVALID_STATUS_TRANSITION);
+            throw new BadRequestException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = OrderStatus.FAILED;
     }
 
     public void cancel() {
         if (!status.canTransitionTo(OrderStatus.CANCELLED)) {
-            throw new UnprocessableEntityException(ErrorCode.INVALID_STATUS_TRANSITION);
+            throw new BadRequestException(ErrorCode.INVALID_STATUS_TRANSITION);
         }
         this.status = OrderStatus.CANCELLED;
     }

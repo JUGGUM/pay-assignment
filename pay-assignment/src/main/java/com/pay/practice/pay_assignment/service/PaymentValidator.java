@@ -5,7 +5,7 @@ import com.pay.practice.pay_assignment.domain.OrderRepository;
 import com.pay.practice.pay_assignment.domain.Payment;
 import com.pay.practice.pay_assignment.domain.PaymentRepository;
 import com.pay.practice.pay_assignment.common.error.ErrorCode;
-import com.pay.practice.pay_assignment.common.error.exception.ConflictException;
+import com.pay.practice.pay_assignment.common.error.exception.BadRequestException;
 import com.pay.practice.pay_assignment.common.error.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -32,7 +32,7 @@ public class PaymentValidator {
         paymentRepository.findByIdempotencyKey(idempotencyKey)
                 .ifPresent(existing -> {
                     if (existing.getStatus() == Payment.PaymentStatus.SUCCESS) {
-                        throw new ConflictException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
+                        throw new BadRequestException(ErrorCode.DUPLICATE_IDEMPOTENCY_KEY);
                     }
                 });
     }
@@ -44,7 +44,7 @@ public class PaymentValidator {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.ORDER_NOT_FOUND));
         if (order.isPaid()) {
-            throw new ConflictException(ErrorCode.ORDER_ALREADY_PAID);
+            throw new BadRequestException(ErrorCode.ORDER_ALREADY_PAID);
         }
         return order;
     }
